@@ -1,6 +1,11 @@
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
 const fs = require("fs");
+const express = require("express");
+const serveStatic = require('serve-static')
+
+var host = "0.0.0.0";
+var http_port = 3000;
 
 //we want to store data in a text file too
 let stream = fs.createWriteStream("session.txt", {flags:'a'});
@@ -45,6 +50,15 @@ parser.on('data', data =>{
   session_data.push(entry);
 });
 
+let server = express();
 
+server.options("/*", function(request, response){
+    response.header("Access-Control-Allow-Origin", "*");
+    response.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+    response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Origin, authtoken");
+    response.sendStatus(200);
+});
 
+server.use(serveStatic('client', {}))
 
+server.listen(http_port, host);

@@ -61,4 +61,10 @@ server.options("/*", function(request, response){
 
 server.use(serveStatic('client', {}))
 
+server.get("/data", (req, resp) =>{
+  resp.header("Access-Control-Allow-Origin", "*");
+  resp.send(session_data);
+
+});
+
 server.listen(http_port, host);

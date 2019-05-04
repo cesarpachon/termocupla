@@ -1,0 +1,24 @@
+{
+  "name": "termocupla",
+  "version": "1.0.0",
+  "description": "captura de temperatura de una termocupla con arduino, visualizacion de curva de temperatura en javascript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cesarpachon/termocupla.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cesarpachon/termocupla/issues"
+  },
+  "homepage": "https://github.com/cesarpachon/termocupla#readme",
+  "devDependencies": {
+    "express": "^4.16.4",
+    "johnny-five": "^1.0.0",
+    "serialport": "^7.1.5"
+  }
+}

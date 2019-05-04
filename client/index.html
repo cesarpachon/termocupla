@@ -1,1 +1,93 @@
-hola
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <script src="d3.v5.min.js"></script>
+  <style>
+    rect {
+      fill: white;
+      stroke: black;
+      stroke-width: 1;
+    }
+    
+    path {
+      fill: none;
+      stroke: black;
+      stroke-width: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+const W = 960;
+const H = 500;
+
+    d3.json("./data").then(data => refresh(data))
+
+    function refresh(data)
+    {
+      console.log(data);
+    var svg = d3.select("body").append("svg")
+      .attr("width", W)
+      .attr("height", H);
+    
+    let mindate = new Date(data[0].time);
+    let maxdate = new Date(data[data.length-1].time);
+
+    var y = d3.scaleLinear()
+    	.domain([0, 1000])
+    	.range([H, 0]);
+
+    y.ticks(10)
+
+    var yaxis = d3.axisLeft(y)
+      .ticks(10)
+      svg.append("g")
+      .attr("transform", "translate(30,0)")
+      .call(yaxis)
+
+    // ordinal
+    var x = d3.scaleTime()
+    	.domain([mindate, maxdate])
+    	.range([0, W]);
+    
+    var xaxis = d3.axisTop(x)
+      .ticks(d3.timeMinute.every(30));
+    svg.append("g")
+    .attr("transform", "translate(0,"+(H-10)+")")
+    .call(xaxis);
+
+    var line = d3.line()
+     .x(function(d, i) {
+        let _x =  x(new Date(d.time)); 
+        debugger
+        return _x;
+     })
+     .y(function(d) {
+       debugger
+       let _y = H - y(+d.temperature)
+       return _y; 
+     });
+ 
+		var s = svg.selectAll("path").data(data).enter()
+    	.append("path")
+    	.attr("d", function(d) {   
+        let l = line(d); 
+        console.log(l);
+        return l;
+      })
+  
+      //reference line
+      svg.append("line")
+      .attr("x1", 0)
+      .attr("y1", H)
+      .attr("x2", W)
+      .attr("y2", 0)
+      .attr("stroke", "green");
+
+
+    }
+
+    
+  </script>
+</body>

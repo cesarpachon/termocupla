@@ -21,23 +21,15 @@
   <script>
 const W = 960;
 const H = 500;
+const M = 30;
 
-    d3.json("./data").then(data => refresh(data))
-
-    function refresh(data)
-    {
-      console.log(data);
-    var svg = d3.select("body").append("svg")
-      .attr("width", W)
-      .attr("height", H);
-    
-    let mindate = new Date(data[0].time);
-    let maxdate = new Date(data[data.length-1].time);
+  var svg = d3.select("body").append("svg")
+    .attr("width", W)
+    .attr("height", H);
 
     var y = d3.scaleLinear()
     	.domain([0, 1000])
-    	.range([H, 0]);
-
+    	.range([H-M, M]);
     y.ticks(10)
 
     var yaxis = d3.axisLeft(y)
@@ -45,49 +37,64 @@ const H = 500;
       svg.append("g")
       .attr("transform", "translate(30,0)")
       .call(yaxis)
-
-    // ordinal
-    var x = d3.scaleTime()
-    	.domain([mindate, maxdate])
-    	.range([0, W]);
+    
+  var x = d3.scaleTime()
+    	.range([M, W-M]);
     
     var xaxis = d3.axisTop(x)
       .ticks(d3.timeMinute.every(30));
-    svg.append("g")
-    .attr("transform", "translate(0,"+(H-10)+")")
-    .call(xaxis);
-
+    
+    var xaxis_group = svg.append("g")
+    .attr("transform", "translate(0,"+(H-M)+")")
+  
     var line = d3.line()
      .x(function(d, i) {
         let _x =  x(new Date(d.time)); 
-        debugger
         return _x;
      })
      .y(function(d) {
-       debugger
-       let _y = H - y(+d.temperature)
+       let _y = y(+d.temperature)
        return _y; 
      });
+
+    //reference line
+    svg.append("line")
+    .attr("x1", M)
+    .attr("y1", H-M)
+    .attr("x2", W-M)
+    .attr("y2", M)
+    .attr("stroke", "green");
+
+function update()
+  {
+    d3.json("./data").then(data => 
+    {
+      refresh(data) 
+      setTimeout(update, 1000);
+    });
+  } 
+
+    function refresh(data)
+    {
+    
+    let mindate = new Date(data[0].time);
+    let maxdate = new Date(data[data.length-1].time);
+
+    // ordinal
+    x.domain([mindate, maxdate]);
+    xaxis_group.call(xaxis);
  
-		var s = svg.selectAll("path").data(data).enter()
+		var s = svg.selectAll("path#datos").data([data]).enter()
     	.append("path")
+      .attr("id", "datos")
     	.attr("d", function(d) {   
         let l = line(d); 
         console.log(l);
         return l;
       })
-  
-      //reference line
-      svg.append("line")
-      .attr("x1", 0)
-      .attr("y1", H)
-      .attr("x2", W)
-      .attr("y2", 0)
-      .attr("stroke", "green");
-
 
     }
-
     
+update()
   </script>
 </body>

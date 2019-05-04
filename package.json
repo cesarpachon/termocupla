@@ -18,6 +18,7 @@
   "homepage": "https://github.com/cesarpachon/termocupla#readme",
   "devDependencies": {
     "express": "^4.16.4",
+    "fs": "0.0.1-security",
     "johnny-five": "^1.0.0",
     "serialport": "^7.1.5"
   }

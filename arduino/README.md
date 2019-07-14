@@ -1,6 +1,6 @@
-#Termocupla - Arduino
+# Termocupla - Arduino
 
-##Conexión al arduino UNO del Max6675k
+## Conexión al arduino UNO del Max6675k
 
 - VCC = 5V
 - GND = GND

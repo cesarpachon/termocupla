@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <head>
   <meta charset="utf-8">
+  <script src="moment.js"></script>
   <script src="d3.v5.min.js"></script>
   <style>
     rect {
@@ -22,6 +23,7 @@
 const W = 960;
 const H = 500;
 const M = 30;
+let simulated_progress = 0; 
 
   var svg = d3.select("body").append("svg")
     .attr("width", W)
@@ -48,16 +50,35 @@ const M = 30;
     .attr("transform", "translate(0,"+(H-M)+")")
   
     var line = d3.line()
-     .x(function(d, i) {
+    .x((d, i) => 
+      {
         let _x =  x(new Date(d.time)); 
         return _x;
      })
-     .y(function(d) {
+    .y(d =>
+    {
        let _y = y(+d.temperature)
        return _y; 
      });
 
-    //reference line
+
+    //reference line (max)
+    svg.append("line")
+    .attr("x1", M)
+    .attr("y1", H-M - y(1000) - 15)
+    .attr("x2", W-M)
+    .attr("y2", M - y(1000) - 15)
+    .attr("stroke", "red");
+    
+    //reference line (min)
+    svg.append("line")
+    .attr("x1", M)
+    .attr("y1", H-M - y(1100) + 30)
+    .attr("x2", W-M)
+    .attr("y2", M - y(1100) + 30)
+    .attr("stroke", "blue");
+    
+    //reference line (middle)
     svg.append("line")
     .attr("x1", M)
     .attr("y1", H-M)
@@ -65,36 +86,136 @@ const M = 30;
     .attr("y2", M)
     .attr("stroke", "green");
 
-function update()
-  {
-    d3.json("./data").then(data => 
-    {
-      refresh(data) 
-      setTimeout(update, 1000);
-    });
-  } 
+    //focus thing
+    /*
+var focus = svg.append("g")
+        .attr("class", "focus")
+        .style("display", "none");
 
-    function refresh(data)
-    {
-    
-    let mindate = new Date(data[0].time);
-    let maxdate = new Date(data[data.length-1].time);
+    focus.append("line")
+        .attr("class", "x-hover-line hover-line")
+        .attr("y1", 0)
+        .attr("y2", height);
 
-    // ordinal
-    x.domain([mindate, maxdate]);
-    xaxis_group.call(xaxis);
- 
-		var s = svg.selectAll("path#datos").data([data]).enter()
-    	.append("path")
-      .attr("id", "datos")
-    	.attr("d", function(d) {   
-        let l = line(d); 
-        console.log(l);
-        return l;
-      })
+    focus.append("line")
+        .attr("class", "y-hover-line hover-line")
+        .attr("x1", width)
+        .attr("x2", width);
 
+    focus.append("circle")
+        .attr("r", 7.5);
+
+    focus.append("text")
+        .attr("x", 15)
+      	.attr("dy", ".31em");
+
+    svg.append("rect")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .attr("class", "overlay")
+        .attr("width", width)
+        .attr("height", height)
+        .on("mouseover", function() { focus.style("display", null); })
+        .on("mouseout", function() { focus.style("display", "none"); })
+        .on("mousemove", mousemove);
+
+function mousemove() {
+     var x0 = x.invert(d3.mouse(this)[0]),
+          i = bisectDate(data, x0, 1),
+          d0 = data[i - 1],
+          d1 = data[i],
+          d = x0 - d0.year > d1.year - x0 ? d1 : d0;
+      focus.attr("transform", "translate(" + x(d.year) + "," + y(d.value) + ")");
+      focus.select("text").text(function() { return d.value; });
+      focus.select(".x-hover-line").attr("y2", height - y(d.value));
+      focus.select(".y-hover-line").attr("x2", width + width);
     }
+*/
+
+/**
+ * render
+ */
+function render()
+{
+
+}
+
+/**
+* repair dates
+ */ 
+function repairDates(data)
+{
+  //demo data comes as hh:mm:ss
+  //but it expects a full date object, like yy:mm:dd hh:mm:ss
+  //just append a prefix. 
+  data.forEach(d => d.time = "2019/07/01 " + d.time);
+}
+
+
+
+/**
+  for testing..
+ */ 
+function simulate()
+{
+  d3.json("./sample.json").then(data => 
+  {
+    repairDates(data);
+    
+    simulated_progress++;
+    if(simulated_progress <= 100)
+    {
+      let index = simulated_progress/100;
+      index = Math.floor(index * data.length);
+      data.splice(index);
+      console.log(data.length);
+      refresh(data) 
+      setTimeout(simulate, 100);
+    }
+  });
+}
+
+
+/**
+*  update
+ */ 
+function update()
+{
+  d3.json("./data").then(data => 
+  {
+    refresh(data) 
+    setTimeout(update, 1000);
+  });
+} 
+
+/**
+ * refresh
+ */
+function refresh(data)
+{
+
+let mindate = new Date(data[0].time);
+//we want a fixed x axis of 10 hours
+//let maxdate = new Date(data[data.length-1].time);
+let maxdate = moment(mindate).add(10, 'h').toDate();
+// ordinal
+x.domain([mindate, maxdate]);
+xaxis_group.call(xaxis);
+
+let dataline = svg.selectAll("path#datos").data([data])
+
+  dataline.enter()
+  .append("path")
+  .attr("id", "datos")
+  
+  
+  dataline.transition()
+  .attr("d", line);
+
+}
     
 update()
+
+//simulate()
+
   </script>
 </body>

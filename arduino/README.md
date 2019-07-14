@@ -10,11 +10,7 @@
 - CLK = Pin 10
 
 ## Descripción del programa
-Se instala un pequeño programa en "C" para el Arduino, cuya función es leer cada diez segundos la temperatura del sensor, y escribirla por el puerto serial, en el siguiente formato: 
-
-hora:minuto:segundo = temperatura
-
-la temperatura se va a escribir en grados centígrados. 
+Se instala un pequeño programa en "C" para el Arduino, cuya función es leer cada diez segundos la temperatura del sensor, y escribirla por el puerto serial, en grados centígrados. 
 
 ## Requerimientos para el programa
 El programa se instala a través de la IDE de Arduino, pero antes hay que instalar en la IDE la librería que controla el chip amplificador MAX6675K. 
@@ -50,3 +46,14 @@ para instalar las dependencias, hay que ir hasta la carpeta "arduino" y ejecutar
 
 Para ejecutar el programa, basta escribir: "node termocupla.js". 
 
+
+Este es un ejemplo del resultado de ejecutar el anterior programa en la consola: 
+
+	
+~~~~
+~/projects/termocupla/arduino [master]: node termocupla.js
+serial port open
+20:18:43 =  27.75
+20:18:53 =  28.25
+20:19:3 =  30.75
+~~~~

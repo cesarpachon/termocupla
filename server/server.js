@@ -12,7 +12,7 @@ let stream = fs.createWriteStream("session.txt", {flags:'a'});
 
 //linux /dev/ttyACM0
 //mac /dev/cu.usbmodem14201
-const serialport_path = '/dev/ttyACM0';
+const serialport_path = '/dev/cu.usbmodem14201';
 
 const port = new SerialPort(serialport_path, { baudRate: 9600 });
 const parser = port.pipe(new Readline({ delimiter: '\n' }));
@@ -28,8 +28,10 @@ port.on("open", () => {
 port.on("error", err => {
     console.log(err);
     console.log("bad luck opening the port? check the available ports here:");
-    SerialPort.list(function (err, ports) {
-      ports.forEach(function(port) {
+    SerialPort.list((err, ports) =>
+    {
+      ports.forEach(port =>
+      {
         console.log(port.comName);
         console.log(port.pnpId);
         console.log(port.manufacturer);
@@ -37,7 +39,8 @@ port.on("error", err => {
     });
 });
 
-parser.on('data', data =>{
+parser.on('data', data =>
+{
   let t = new Date();
   let msg = t.getHours()+':'+ t.getMinutes()+":"+t.getSeconds()+" = "+ data;
   console.log(msg);
@@ -52,19 +55,20 @@ parser.on('data', data =>{
 
 let server = express();
 
-server.options("/*", function(request, response){
+server.options("/*", (request, response) => 
+{
     response.header("Access-Control-Allow-Origin", "*");
     response.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Origin, authtoken");
     response.sendStatus(200);
 });
 
-server.use(serveStatic('client', {}))
+server.use(serveStatic('../client', {}));
 
-server.get("/data", (req, resp) =>{
+server.get("/data", (req, resp) =>
+{
   resp.header("Access-Control-Allow-Origin", "*");
   resp.send(session_data);
-
 });
 
 server.listen(http_port, host);
